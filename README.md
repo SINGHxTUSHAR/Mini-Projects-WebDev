@@ -1,4 +1,4 @@
-[![GitHub license](https://img.shields.io/github/license/SINGHxTUSHAR/Mini-Projects-WebDev.svg)](https://github.com/SINGHxTUSHAR/Mini-Projects-WebDev/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/SINGHxTUSHAR/Mini-Projects-WebDev.svg)](https://github.com/SINGHxTUSHAR/Mini-Projects-WebDev/blob/main/LICENSE)
 [![GitHub contributors](https://img.shields.io/github/contributors/SINGHxTUSHAR/Mini-Projects-WebDev.svg)](https://GitHub.com/SINGHxTUSHAR/Mini-Projects-WebDev/graphs/contributors/)
 [![GitHub issues](https://img.shields.io/github/issues/SINGHxTUSHAR/Mini-Projects-WebDev.svg)](https://GitHub.com/SINGHxTUSHAR/Mini-Projects-WebDev/issues/)
 [![GitHub pull-requests](https://img.shields.io/github/issues-pr/SINGHxTUSHAR/Mini-Projects-WebDev.svg)](https://GitHub.com/SINGHxTUSHAR/Mini-Projects-WebDev/pulls/)
