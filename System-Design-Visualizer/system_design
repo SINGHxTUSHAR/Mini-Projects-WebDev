@@ -94,6 +94,7 @@
         <textarea id="instructions" rows="4" placeholder="Enter system design instructions (e.g., WhatsApp, Facebook, YouTube, Twitter)"></textarea>
         <br>
         <button onclick="generateDiagram()">Generate Diagram</button>
+        <button id="refreshButton" onclick="refreshDiagram()">Refresh</button>
         <br>
         <input id="newBoxText" type="text" placeholder="Enter box text">
         <input id="boxColor" type="color" value="#000000" title="Box Color">
@@ -260,6 +261,17 @@
                 drawArrow(connection.from.x + connection.from.width / 2, connection.from.y + connection.from.height,
                     connection.to.x + connection.to.width / 2, connection.to.y);
             });
+        }
+        
+        function refreshDiagram() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            boxes = [];
+            connections = [];
+            zoomLevel = 1;
+            document.getElementById('zoomRange').value = 1;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            document.getElementById('instructions').value = '';
+            redrawDiagram();
         }
 
         function addNewBox() {
