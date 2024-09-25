@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Player Comparison Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .selection {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        select {
+            width: 45%;
+            padding: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .better {
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cricket Player Comparison Tool</h1>
+    <div class="selection">
+        <select id="player1">
+            <option value="sachin">Dhoni</option>
+            <option value="virat">Virat Kohli</option>
+        </select>
+        <select id="player2">
+            <option value="virat">Virat Kohli</option>
+            <option value="sachin">Dhoni</option>
+        </select>
+    </div>
+    <table id="comparison">
+        <tr>
+            <th>Statistic</th>
+            <th id="name1"></th>
+            <th id="name2"></th>
+        </tr>
+    </table>
+
+    <script>
+        // Dummy data (replace this with API data in a real implementation)
+        const playerData = {
+            sachin: {
+                name: "Dhoni",
+                matches: 1200,
+                runs: 19921,
+                average: 70.78,
+                centuries: 81,
+                halfCenturies: 68,
+                highestScore: 248
+            },
+            virat: {
+                name: "Virat Kohli",
+                matches: 101,
+                runs: 8074,
+                average: 49.53,
+                centuries: 27,
+                halfCenturies: 28,
+                highestScore: 254
+            }
+        };
+
+        const player1Select = document.getElementById('player1');
+        const player2Select = document.getElementById('player2');
+        const comparisonTable = document.getElementById('comparison');
+
+        function updateComparison() {
+            const player1 = playerData[player1Select.value];
+            const player2 = playerData[player2Select.value];
+
+            document.getElementById('name1').textContent = player1.name;
+            document.getElementById('name2').textContent = player2.name;
+
+            comparisonTable.innerHTML = `
+                <tr>
+                    <th>Statistic</th>
+                    <th>${player1.name}</th>
+                    <th>${player2.name}</th>
+                </tr>
+            `;
+
+            const stats = ['matches', 'runs', 'average', 'centuries', 'halfCenturies', 'highestScore'];
+            stats.forEach(stat => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${stat.charAt(0).toUpperCase() + stat.slice(1)}</td>
+                    <td class="${player1[stat] > player2[stat] ? 'better' : ''}">${player1[stat]}</td>
+                    <td class="${player2[stat] > player1[stat] ? 'better' : ''}">${player2[stat]}</td>
+                `;
+                comparisonTable.appendChild(row);
+            });
+        }
+
+        player1Select.addEventListener('change', updateComparison);
+        player2Select.addEventListener('change', updateComparison);
+
+        // Initial comparison
+        updateComparison();
+    </script>
+</body>
+</html>
