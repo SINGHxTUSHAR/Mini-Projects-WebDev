@@ -116,7 +116,7 @@
     <canvas id="diagramCanvas" width="1200" height="800"></canvas>
 
     <footer>
-        <p>Author: TUSHAR SINGH | Project: System-Design-Visualizer | <a href="https://github.com/your-repo-link" target="_blank">GitHub Repo</a></p>
+        <p>Author: TUSHAR SINGH | Project: System-Design-Visualizer | <a href="https://github.com/SINGHxTUSHAR/Mini-Projects-WebDev/blob/main/System-Design-Visualizer/system_design" target="_blank">GitHub Repo</a></p>
     </footer>
 
     <script>
