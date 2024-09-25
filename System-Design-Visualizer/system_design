@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System-Design-Visualizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        #controls {
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        #instructions {
+            width: 80%;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="text"], input[type="color"], input[type="number"] {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border: 1px solid black;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f1f1f1;
+            margin-top: auto;
+        }
+
+        footer a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>System-Design-Visualizer</h1>
+    </header>
+
+    <div id="controls">
+        <textarea id="instructions" rows="4" placeholder="Enter system design instructions (e.g., WhatsApp, Facebook, YouTube, Twitter)"></textarea>
+        <br>
+        <button onclick="generateDiagram()">Generate Diagram</button>
+        <br>
+        <input id="newBoxText" type="text" placeholder="Enter box text">
+        <input id="boxColor" type="color" value="#000000" title="Box Color">
+        <input id="boxWidth" type="number" value="120" placeholder="Box Width">
+        <input id="boxHeight" type="number" value="60" placeholder="Box Height">
+        <button onclick="addNewBox()">Add New Box</button>
+        <button onclick="toggleConnectionMode()">Toggle Connection Mode</button>
+        <br>
+        <button onclick="exportAsImage('png')">Export as PNG</button>
+        <button onclick="exportAsImage('jpg')">Export as JPG</button>
+        <button onclick="exportAsJSON()">Export as JSON</button>
+        <input type="file" id="loadJSON" style="display:none;" onchange="importFromJSON(event)">
+        <button onclick="document.getElementById('loadJSON').click()">Import JSON</button>
+        <br>
+        <label>Zoom:</label>
+        <input type="range" id="zoomRange" min="0.5" max="2" value="1" step="0.1" oninput="zoomDiagram(this.value)">
+    </div>
+
+    <!-- Increased canvas size -->
+    <canvas id="diagramCanvas" width="1200" height="800"></canvas>
+
+    <footer>
+        <p>Author: TUSHAR SINGH | Project: System-Design-Visualizer | <a href="https://github.com/your-repo-link" target="_blank">GitHub Repo</a></p>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('diagramCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let boxes = [];
+        let connections = [];
+        let isDragging = false;
+        let draggedBox = null;
+        let offsetX, offsetY;
+        let isConnecting = false;
+        let connectionStart = null;
+        let zoomLevel = 1;
+
+        function generateDiagram() {
+            const instructions = document.getElementById('instructions').value.toLowerCase();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            boxes = [];
+            connections = [];
+
+            switch (true) {
+                case instructions.includes('whatsapp'):
+                    drawWhatsAppDiagram();
+                    break;
+                case instructions.includes('facebook'):
+                    drawFacebookDiagram();
+                    break;
+                case instructions.includes('youtube'):
+                    drawYouTubeDiagram();
+                    break;
+                case instructions.includes('twitter'):
+                    drawTwitterDiagram();
+                    break;
+                default:
+                    ctx.font = '20px Arial';
+                    ctx.fillText('Unsupported system. Try "WhatsApp", "Facebook", "YouTube", or "Twitter".', 20, 40);
+                    break;
+            }
+        }
+
+        function drawBox(x, y, width, height, text, color = '#000000') {
+            ctx.strokeStyle = color;
+            ctx.strokeRect(x, y, width, height);
+            ctx.font = '14px Arial';
+            ctx.fillText(text, x + 10, y + 25);
+            boxes.push({x, y, width, height, text, color});
+        }
+
+        function drawArrow(fromX, fromY, toX, toY) {
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - 15 * Math.cos(angle - Math.PI / 6), toY - 15 * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - 15 * Math.cos(angle + Math.PI / 6), toY - 15 * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawWhatsAppDiagram() {
+            drawBox(50, 50, 120, 60, 'User Interface');
+            drawBox(300, 50, 120, 60, 'Chat Server');
+            drawBox(550, 50, 120, 60, 'Database');
+            drawBox(300, 200, 120, 60, 'Media Server');
+
+            connections = [
+                {from: boxes[0], to: boxes[1]},
+                {from: boxes[1], to: boxes[2]},
+                {from: boxes[1], to: boxes[3]}
+            ];
+
+            redrawDiagram();
+            ctx.font = '16px Arial';
+            ctx.fillText('WhatsApp System Design', 300, 30);
+        }
+
+        function drawFacebookDiagram() {
+            drawBox(100, 100, 120, 60, 'User Interface');
+            drawBox(300, 100, 120, 60, 'Web Server');
+            drawBox(500, 100, 120, 60, 'Database');
+            drawBox(300, 250, 120, 60, 'Cache');
+
+            connections = [
+                {from: boxes[0], to: boxes[1]},
+                {from: boxes[1], to: boxes[2]},
+                {from: boxes[1], to: boxes[3]},
+                {from: boxes[3], to: boxes[2]}
+            ];
+
+            redrawDiagram();
+            ctx.font = '16px Arial';
+            ctx.fillText('Facebook System Design', 300, 30);
+        }
+
+        function drawYouTubeDiagram() {
+            drawBox(50, 100, 120, 60, 'User Interface');
+            drawBox(250, 100, 120, 60, 'Web Server');
+            drawBox(450, 100, 120, 60, 'Streaming Server');
+            drawBox(250, 250, 120, 60, 'Database');
+
+            connections = [
+                {from: boxes[0], to: boxes[1]},
+                {from: boxes[1], to: boxes[2]},
+                {from: boxes[1], to: boxes[3]}
+            ];
+
+            redrawDiagram();
+            ctx.font = '16px Arial';
+            ctx.fillText('YouTube System Design', 300, 30);
+        }
+
+        function drawTwitterDiagram() {
+            drawBox(100, 100, 120, 60, 'User Interface');
+            drawBox(300, 100, 120, 60, 'API Server');
+            drawBox(500, 100, 120, 60, 'Database');
+            drawBox(300, 250, 120, 60, 'Cache');
+
+            connections = [
+                {from: boxes[0], to: boxes[1]},
+                {from: boxes[1], to: boxes[2]},
+                {from: boxes[1], to: boxes[3]},
+                {from: boxes[3], to: boxes[2]}
+            ];
+
+            redrawDiagram();
+            ctx.font = '16px Arial';
+            ctx.fillText('Twitter System Design', 300, 30);
+        }
+
+        function redrawDiagram() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            boxes.forEach(box => {
+                drawBox(box.x, box.y, box.width, box.height, box.text, box.color);
+            });
+            connections.forEach(connection => {
+                drawArrow(connection.from.x + connection.from.width / 2, connection.from.y + connection.from.height,
+                    connection.to.x + connection.to.width / 2, connection.to.y);
+            });
+        }
+
+        function addNewBox() {
+            const boxText = document.getElementById('newBoxText').value;
+            const boxColor = document.getElementById('boxColor').value;
+            const boxWidth = parseInt(document.getElementById('boxWidth').value) || 120;
+            const boxHeight = parseInt(document.getElementById('boxHeight').value) || 60;
+
+            // Example positioning logic; modify as necessary for your application
+            const x = Math.random() * (canvas.width - boxWidth);
+            const y = Math.random() * (canvas.height - boxHeight);
+
+            drawBox(x, y, boxWidth, boxHeight, boxText, boxColor);
+        }
+
+        function toggleConnectionMode() {
+            isConnecting = !isConnecting;
+            if (isConnecting) {
+                canvas.style.cursor = 'crosshair';
+                canvas.addEventListener('mousedown', startConnection);
+                canvas.addEventListener('mouseup', endConnection);
+            } else {
+                canvas.style.cursor = 'default';
+                canvas.removeEventListener('mousedown', startConnection);
+                canvas.removeEventListener('mouseup', endConnection);
+            }
+        }
+
+        function startConnection(event) {
+            const mousePos = getMousePos(canvas, event);
+            connectionStart = getBoxAtPosition(mousePos.x, mousePos.y);
+        }
+
+        function endConnection(event) {
+            const mousePos = getMousePos(canvas, event);
+            const connectionEnd = getBoxAtPosition(mousePos.x, mousePos.y);
+            if (connectionStart && connectionEnd && connectionStart !== connectionEnd) {
+                connections.push({from: connectionStart, to: connectionEnd});
+                redrawDiagram();
+            }
+            connectionStart = null;
+        }
+
+        function getMousePos(canvas, event) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+        }
+
+        function getBoxAtPosition(x, y) {
+            for (let box of boxes) {
+                if (x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height) {
+                    return box;
+                }
+            }
+            return null;
+        }
+
+        function exportAsImage(type) {
+            const link = document.createElement('a');
+            link.download = `diagram.${type}`;
+            link.href = canvas.toDataURL(`image/${type}`);
+            link.click();
+        }
+
+        function exportAsJSON() {
+            const data = {
+                boxes: boxes,
+                connections: connections
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], {type: 'application/json'});
+            const link = document.createElement('a');
+            link.download = 'diagram.json';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        }
+
+        function importFromJSON(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = JSON.parse(e.target.result);
+                boxes = data.boxes;
+                connections = data.connections;
+                redrawDiagram();
+            };
+            reader.readAsText(file);
+        }
+
+        function zoomDiagram(value) {
+            zoomLevel = value;
+            ctx.setTransform(zoomLevel, 0, 0, zoomLevel, 0, 0);
+            redrawDiagram();
+        }
+    </script>
+</body>
+</html>
