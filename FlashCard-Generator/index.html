@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Flashcard Generator</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1a2530;
+            --navy-600: #2c3e50;
+            --navy-700: #34495e;
+            --navy-800: #2c3e50;
+            --navy-900: #1a2530;
+            --blue-500: #3498db;
+            --blue-600: #2980b9;
+        }
+
+        .dark {
+            --bg-color: var(--navy-900);
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        header {
+            background-color: var(--navy-800);
+            color: #ffffff;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: var(--blue-500);
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--blue-600);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 2rem 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border: 1px solid var(--navy-600);
+            border-radius: 4px;
+            resize: vertical;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .flashcards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .flashcard {
+            background-color: var(--blue-500);
+            color: #ffffff;
+            border-radius: 8px;
+            height: 200px;
+            cursor: pointer;
+            perspective: 1000px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .flashcard-back {
+            background-color: var(--blue-600);
+            transform: rotateY(180deg);
+        }
+
+        footer {
+            background-color: var(--navy-800);
+            color: #ffffff;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+
+        footer a {
+            color: var(--blue-500);
+        }
+
+        @media (max-width: 768px) {
+            .flashcards {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Flashcard Generator</h1>
+            <button id="theme-toggle">Toggle Theme</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2>Custom Flashcard Generator</h2>
+        <textarea id="input-text" placeholder="Enter your text here..."></textarea>
+        <button id="generate-btn">Generate Flashcards</button>
+        <div id="flashcards" class="flashcards"></div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p><a href="https://github.com/yourusername/flashcard-generator" target="_blank" rel="noopener noreferrer">GitHub Repository</a></p>
+            <p>Created by TUSHAR SINGH</p>
+            <p>Future updates coming soon!</p>
+        </div>
+    </footer>
+
+    <script>
+        class FlashcardGenerator extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+            }
+
+            connectedCallback() {
+                this.render();
+                this.setupEventListeners();
+            }
+
+            render() {
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                        }
+                    </style>
+                    <slot></slot>
+                `;
+            }
+
+            setupEventListeners() {
+                const generateBtn = document.getElementById('generate-btn');
+                generateBtn.addEventListener('click', () => this.generateFlashcards());
+            }
+
+            generateFlashcards() {
+                const inputText = document.getElementById('input-text').value;
+                const sentences = inputText.match(/[^\.!\?]+[\.!\?]+/g) || [];
+                const flashcardsContainer = document.getElementById('flashcards');
+                flashcardsContainer.innerHTML = '';
+
+                sentences.slice(0, 3).forEach((sentence, index) => {
+                    const flashcard = document.createElement('div');
+                    flashcard.className = 'flashcard';
+                    flashcard.innerHTML = `
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">
+                                <p>Card ${index + 1}</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p>${sentence.trim()}</p>
+                            </div>
+                        </div>
+                    `;
+                    flashcard.addEventListener('click', () => {
+                        flashcard.classList.toggle('flipped');
+                    });
+                    flashcardsContainer.appendChild(flashcard);
+                });
+            }
+        }
+
+        customElements.define('flashcard-generator', FlashcardGenerator);
+
+        // Theme toggling
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // Set initial theme
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.body.classList.add('dark');
+        }
+
+        // Initialize the FlashcardGenerator
+        const flashcardGenerator = document.createElement('flashcard-generator');
+        document.body.appendChild(flashcardGenerator);
+    </script>
+</body>
+</html>
