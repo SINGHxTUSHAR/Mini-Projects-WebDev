@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Matching Game</title>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #1a1a1a;
+        color: #fff;
+    }
+    .game-board {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        width: 100%;
+        max-width: 800px;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .card {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        aspect-ratio: 1 / 1;
+        background-color: #333;
+        font-size: 24px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+    }
+    .card.flipped {
+        background-color: #555;
+        transform: scale(1.05);
+    }
+    .card.clicked {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+</style>
+</head>
+<body>
+<div class="game-board"></div>
+<script>
+    const numbers = Array.from({length: 8}, (_, i) => i + 1).flatMap(n => [n, n]);
+    let flippedCards = [];
+    let matchedCards = new Set();
+    let canFlip = true;
+
+    function createCard(number) {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.dataset.number = number;
+        card.textContent = '?';
+        card.addEventListener('click', flipCard);
+        return card;
+    }
+
+    function flipCard() {
+        if (!canFlip || flippedCards.length >= 4 || this.classList.contains('flipped') || matchedCards.has(parseInt(this.dataset.number))) {
+            return;
+        }
+        this.classList.add('flipped', 'clicked');
+        this.textContent = this.dataset.number;
+        flippedCards.push(this);
+
+        if (flippedCards.length === 4) {
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        canFlip = false;
+        setTimeout(() => {
+            const [card1, card2, card3, card4] = flippedCards;
+            if (card1.dataset.number === card2.dataset.number && card3.dataset.number === card4.dataset.number) {
+                matchedCards.add(parseInt(card1.dataset.number));
+                matchedCards.add(parseInt(card3.dataset.number));
+                flippedCards.forEach(card => card.classList.remove('clicked'));
+                if (matchedCards.size === numbers.length / 2) {
+                    alert('Congratulations! You won!');
+                }
+            } else {
+                flippedCards.forEach(card => {
+                    card.classList.remove('flipped', 'clicked');
+                    card.textContent = '?';
+                });
+            }
+            flippedCards = [];
+            canFlip = true;
+        }, 1000);
+    }
+
+    function initGame() {
+        const gameBoard = document.querySelector('.game-board');
+        numbers.sort(() => Math.random() - 0.5);
+        numbers.forEach(number => {
+            const card = createCard(number);
+            gameBoard.appendChild(card);
+        });
+    }
+
+    initGame();
+</script>
+</body>
+</html>
