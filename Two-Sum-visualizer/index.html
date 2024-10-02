@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Sum Visualizer</title>
+    <style>
+        :root {
+            --bg-color: #2c2c2c;
+            --text-color: #e0e0e0;
+            --highlight-color: #ffd700;
+            --solution-color: #32cd32;
+            --header-bg: #1c1c1c;
+            --footer-bg: #1c1c1c;
+            --button-bg: #3c3c3c;
+            --button-hover: #4c4c4c;
+            --input-bg: #3c3c3c;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        header {
+            background-color: var(--header-bg);
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 1rem;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 2rem 2rem;
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin: 0 1rem;
+        }
+
+        #array-container {
+            display: flex;
+            margin-bottom: 2rem;
+        }
+
+        .array-element {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 5px;
+            background-color: var(--input-bg);
+        }
+
+        .highlight {
+            background-color: var(--highlight-color);
+            color: #000;
+        }
+
+        .solution {
+            background-color: var(--solution-color);
+            color: #000;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 15px;
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        footer {
+            background-color: var(--footer-bg);
+            padding: 1rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        #theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        input[type="text"], input[type="number"] {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 5px 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        #status {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <button id="theme-toggle">Toggle Theme</button>
+
+    <main>
+        <h1>Two Sum Visualizer</h1>
+        <div class="input-container">
+            <div class="input-group">
+                <label for="array-input">Enter array (comma-separated):</label>
+                <input type="text" id="array-input" value="2,7,11,15">
+            </div>
+            <div class="input-group">
+                <label for="target-input">Enter target sum:</label>
+                <input type="number" id="target-input" value="9">
+            </div>
+        </div>
+        <div>
+            <button onclick="initializeArray()">Initialize Array</button>
+            <button onclick="startVisualization('linear')">Linear Search</button>
+            <button onclick="startVisualization('twoPointers')">Two Pointers</button>
+        </div>
+        <div id="array-container"></div>
+        <div id="status"></div>
+    </main>
+
+    <footer>
+        <p>GitHub Repo: <a href="https://github.com/yourusername/two-sum-visualizer" target="_blank">Two Sum Visualizer</a></p>
+        <p>Author: TUSHAR SINGH</p>
+        <p>&copy; 2023 @SINGHxTUSHAR. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let array = [];
+        let target = 0;
+        let intervalId;
+
+        function initializeArray() {
+            const arrayInput = document.getElementById('array-input').value;
+            array = arrayInput.split(',').map(Number);
+            target = parseInt(document.getElementById('target-input').value);
+            renderArray();
+        }
+
+        function renderArray() {
+            const container = document.getElementById('array-container');
+            container.innerHTML = '';
+            array.forEach((num, index) => {
+                const element = document.createElement('div');
+                element.className = 'array-element';
+                element.textContent = num;
+                element.id = `element-${index}`;
+                container.appendChild(element);
+            });
+        }
+
+        function startVisualization(method) {
+            clearInterval(intervalId);
+            renderArray();
+            document.getElementById('status').textContent = '';
+            
+            let i = 0, j = method === 'twoPointers' ? array.length - 1 : 0;
+            
+            intervalId = setInterval(() => {
+                if (method === 'linear') {
+                    linearSearchStep(i, j);
+                    j++;
+                    if (j === array.length) {
+                        i++;
+                        j = i + 1;
+                    }
+                } else if (method === 'twoPointers') {
+                    twoPointersStep(i, j);
+                }
+                
+                if (i >= array.length - 1 || j < 0) {
+                    clearInterval(intervalId);
+                    document.getElementById('status').textContent = 'No solution found';
+                }
+            }, 1000);
+        }
+
+        function linearSearchStep(i, j) {
+            highlightElements(i, j);
+            if (array[i] + array[j] === target) {
+                solutionFound(i, j);
+            }
+        }
+
+        function twoPointersStep(i, j) {
+            highlightElements(i, j);
+            const sum = array[i] + array[j];
+            if (sum === target) {
+                solutionFound(i, j);
+            } else if (sum < target) {
+                i++;
+            } else {
+                j--;
+            }
+        }
+
+        function highlightElements(i, j) {
+            document.querySelectorAll('.array-element').forEach(el => el.classList.remove('highlight'));
+            document.getElementById(`element-${i}`).classList.add('highlight');
+            document.getElementById(`element-${j}`).classList.add('highlight');
+        }
+
+        function solutionFound(i, j) {
+            clearInterval(intervalId);
+            document.getElementById(`element-${i}`).classList.add('solution');
+            document.getElementById(`element-${j}`).classList.add('solution');
+            document.getElementById('status').textContent = `Solution found: indices ${i} and ${j}`;
+        }
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+        });
+    </script>
+</body>
+</html>
