@@ -109,16 +109,16 @@ export default function PaymentPage() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-600 dark:text-gray-300 text-sm">
-              © 2023 PayEase. All rights reserved.
+              © 2024 PayEase. All rights reserved.
             </div>
             <div className="mt-4 md:mt-0">
-              <a href="https://github.com/payease/payment-page" className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400">
+              <a href="https://github.com/SINGHxTUSHAR/Mini-Projects-WebDev/tree/main/payment-project" className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400">
                 GitHub Repository
               </a>
             </div>
           </div>
           <div className="mt-4 text-center text-gray-600 dark:text-gray-300 text-xs">
-            Designed by John Smith for PayEase Inc.
+            Designed by SINGHxTUSHAR for PayEase Inc.
           </div>
         </div>
       </footer>
